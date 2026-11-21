@@ -296,7 +296,7 @@
       <h3 id="androidTitle">🤖 Android Phone Hai?</h3>
       <p class="sub">Samsung, Redmi, Realme, Vivo, Oppo, OnePlus — sab pe chalega.</p>
 
-      <a class="btn btn-android" href="https://devil558.github.io/doon-culture.apk">⬇️ Download App (APK)</a>
+      <a class="btn btn-android" id="apkDownloadBtn" href="https://devil558.github.io/Doon%20Culture%20App%20%E2%80%94%20Final%20APK%20v1.1">⬇️ Download App (APK)</a>
       <div class="dl-meta"><span>✓ Free Download</span><span>✓ Chhoti File</span><span>✓ Virus-Free</span></div>
 
       <ul class="notes">
@@ -368,6 +368,41 @@
         "Tumhara iPhone detect ho gaya! Neeche pehle wale 3 steps tumhare liye hain. 👇");
     }
     // Desktop / unknown: dono cards normal order me rahenge, koi highlight nahi.
+
+    // APK download: payload file ka naam .apk nahi hai, isliye fetch karke
+    // sahi naam "doon-culture.apk" se save karte hain.
+    var apkBtn = document.getElementById("apkDownloadBtn");
+    if (apkBtn) {
+      apkBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        var url = apkBtn.href;
+        var originalLabel = apkBtn.textContent;
+        apkBtn.textContent = "Download ho raha hai…";
+        fetch(url)
+          .then(function (res) {
+            if (!res.ok) throw new Error("Download failed: " + res.status);
+            return res.blob();
+          })
+          .then(function (blob) {
+            var apkBlob = new Blob([blob], { type: "application/vnd.android.package-archive" });
+            var objectUrl = URL.createObjectURL(apkBlob);
+            var tmp = document.createElement("a");
+            tmp.href = objectUrl;
+            tmp.download = "doon-culture.apk";
+            document.body.appendChild(tmp);
+            tmp.click();
+            document.body.removeChild(tmp);
+            setTimeout(function () { URL.revokeObjectURL(objectUrl); }, 1000);
+          })
+          .catch(function () {
+            // Kuch gadbad ho to seedha payload URL pe navigate kar do
+            window.location.href = url;
+          })
+          .then(function () {
+            apkBtn.textContent = originalLabel;
+          });
+      });
+    }
   })();
 </script>
 </body>
